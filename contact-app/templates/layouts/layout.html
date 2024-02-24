@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <title>Contact App</title>
+  <link rel="stylesheet" href="https://the.missing.style/v0.2.0/missing.min.css">
+  <link rel="stylesheet" href="/static/site.css">
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>
+        <span class="allcaps">contacts.app</span>
+        <sub-title>A Demo Contacts Application</sub-title>
+      </h1>
+    </header>
+    {{with .flashmsg}}
+    <div class="flash">{{.}}</div>
+    {{end}}
+    {{template "content" .}}
+  </main>
+</body>
+
+</html>

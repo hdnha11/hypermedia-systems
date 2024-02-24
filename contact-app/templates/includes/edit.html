@@ -1,0 +1,40 @@
+{{template "layout.html" .}}
+
+{{define "content"}}
+<form action="/contacts/{{.data.contact.ID}}/edit" method="post">
+  <fieldset>
+    <legend>Contact Values</legend>
+    <div class="table rows">
+      <p>
+        <label for="email">Email</label>
+        <input name="email" id="email" type="text" placeholder="Email" value="{{.data.contact.Email}}">
+        <span class="error">{{.data.errors.Email}}</span>
+      </p>
+      <p>
+        <label for="first">First Name</label>
+        <input name="first" id="first" type="text" placeholder="First Name" value="{{.data.contact.First}}">
+        <span class="error">{{.data.errors.First}}</span>
+      </p>
+      <p>
+        <label for="last">Last Name</label>
+        <input name="last" id="last" type="text" placeholder="Last Name" value="{{.data.contact.Last}}">
+        <span class="error">{{.data.errors.Last}}</span>
+      </p>
+      <p>
+        <label for="phone">Phone</label>
+        <input name="phone" id="phone" type="text" placeholder="Phone" value="{{.data.contact.Phone}}">
+        <span class="error">{{.data.errors.Phone}}</span>
+      </p>
+    </div>
+    <button>Save</button>
+  </fieldset>
+</form>
+
+<form action="/contacts/{{.data.contact.ID}}/delete" method="post">
+  <button>Delete Contact</button>
+</form>
+
+<p>
+  <a href="/contacts">Back</a>
+</p>
+{{end}}

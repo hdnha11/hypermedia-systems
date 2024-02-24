@@ -1,0 +1,15 @@
+{{template "layout.html" .}}
+
+{{define "content"}}
+<h1>{{.data.First}} {{.data.Last}}</h1>
+
+<div>
+  <div>Phone: {{.data.Phone}}</div>
+  <div>Email: {{.data.Email}}</div>
+</div>
+
+<p>
+  <a href="/contacts/{{.data.ID}}/edit">Edit</a>
+  <a href="/contacts">Back</a>
+</p>
+{{end}}
