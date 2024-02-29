@@ -16,9 +16,9 @@ type Contact struct {
 }
 
 type InMemContactRepository struct {
-	db     []*Contact
-	mu     sync.Mutex
-	nextID int
+	db    []*Contact
+	mu    sync.Mutex
+	total int
 }
 
 func (r *InMemContactRepository) GetAll(ctx context.Context) ([]*Contact, error) {
@@ -55,8 +55,8 @@ func (r *InMemContactRepository) Save(ctx context.Context, contact *Contact) err
 	}
 
 	if contact.ID == 0 {
-		contact.ID = r.nextID
-		r.nextID++
+		r.total++
+		contact.ID = r.total
 		r.db = append(r.db, contact)
 	} else {
 		_, found, err := r.find(contact.ID)
