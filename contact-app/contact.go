@@ -55,7 +55,7 @@ func (r *InMemContactRepository) Validate(contact *Contact) error {
 		verr.AddFieldError("Email", "Invalid Email Address")
 	}
 	for _, c := range r.db {
-		if c.Email == contact.Email {
+		if c.ID != contact.ID && c.Email == contact.Email {
 			verr.AddFieldError("Email", "Email Must Be Unique")
 			break
 		}

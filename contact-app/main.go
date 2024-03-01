@@ -22,7 +22,8 @@ func main() {
 	r.GET("/contacts/:id", handleContactView)
 	r.GET("/contacts/:id/edit", handleContactEditGet)
 	r.POST("/contacts/:id/edit", handleContactEdit)
-	r.POST("/contacts/:id/delete", handleContactDelete)
+	r.GET("/contacts/:id/email", handleContactEmailGet)
+	r.DELETE("/contacts/:id", handleContactDelete)
 
 	r.Run(":8080")
 }
@@ -149,6 +150,34 @@ func handleContactEdit(c *gin.Context) {
 
 	Flash(c, "Updated Contact!")
 	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contacts/%d", id))
+}
+
+func handleContactEmailGet(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		log.Println(err)
+		renderError(c, err)
+		return
+	}
+
+	email := c.Query("email")
+
+	var (
+		contact    *Contact
+		contactUdp Contact
+	)
+	if id > 0 {
+		contact, err = contactRepo.Find(c.Request.Context(), int(id))
+		if err != nil {
+			log.Println(err)
+			renderError(c, err)
+			return
+		}
+		contactUdp = *contact
+	}
+	contactUdp.Email = email
+
+	c.String(http.StatusOK, FieldErrors(contactRepo.Validate(&contactUdp))["Email"])
 }
 
 func handleContactDelete(c *gin.Context) {

@@ -7,7 +7,8 @@
     <div class="table rows">
       <p>
         <label for="email">Email</label>
-        <input name="email" id="email" type="text" placeholder="Email" value="{{.data.contact.Email}}">
+        <input name="email" id="email" type="email" hx-get="/contacts/{{.data.contact.ID}}/email"
+          hx-trigger="change, keyup delay:200ms changed" hx-target="next .error" placeholder="Email" value="{{.data.contact.Email}}">
         <span class="error">{{.data.errors.Email}}</span>
       </p>
       <p>
@@ -30,9 +31,10 @@
   </fieldset>
 </form>
 
-<form action="/contacts/{{.data.contact.ID}}/delete" method="post">
-  <button>Delete Contact</button>
-</form>
+<button hx-delete="/contacts/{{.data.contact.ID}}" hx-target="body" hx-push-url="true"
+  hx-confirm="Are you sure you want to delete this contact?">
+  Delete Contact
+</button>
 
 <p>
   <a href="/contacts">Back</a>
