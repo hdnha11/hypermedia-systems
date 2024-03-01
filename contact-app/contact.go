@@ -46,12 +46,38 @@ func (r *InMemContactRepository) Search(ctx context.Context, q string) ([]*Conta
 	return contacts, nil
 }
 
+func (r *InMemContactRepository) Validate(contact *Contact) error {
+	verr := &ValidationError{}
+
+	if contact.Email == "" {
+		verr.AddFieldError("Email", "Email Required")
+	} else if !strings.Contains(contact.Email, "@") {
+		verr.AddFieldError("Email", "Invalid Email Address")
+	}
+	for _, c := range r.db {
+		if c.Email == contact.Email {
+			verr.AddFieldError("Email", "Email Must Be Unique")
+			break
+		}
+	}
+
+	if contact.First == "" {
+		verr.AddFieldError("First", "First Name Required")
+	}
+
+	if verr.FieldErrors() != nil {
+		return verr
+	}
+
+	return nil
+}
+
 func (r *InMemContactRepository) Save(ctx context.Context, contact *Contact) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if !strings.Contains(contact.Email, "@") {
-		return fmt.Errorf("%s is an invalid email address", contact.Email)
+	if err := r.Validate(contact); err != nil {
+		return err
 	}
 
 	if contact.ID == 0 {

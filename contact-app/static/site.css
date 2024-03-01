@@ -8,3 +8,8 @@
     border-radius: 8px;
     margin: 16px;
 }
+
+.error {
+    display: inline-block;
+    color: darkred;
+}

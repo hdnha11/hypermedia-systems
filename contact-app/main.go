@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -47,6 +48,7 @@ func handleContacts(c *gin.Context) {
 	}
 
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
@@ -57,23 +59,23 @@ func handleContacts(c *gin.Context) {
 func handleContactNewGet(c *gin.Context) {
 	c.HTML(http.StatusOK, "new.html", templateData(c, gin.H{
 		"contact": Contact{},
-		"errors":  map[string]string{},
+		"errors":  FieldErrors(nil),
 	}))
 }
 
 func handleContactNew(c *gin.Context) {
 	var contact Contact
 	if err := c.Bind(&contact); err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
 
 	if err := contactRepo.Save(c.Request.Context(), &contact); err != nil {
+		log.Println(err)
 		c.HTML(http.StatusOK, "new.html", templateData(c, gin.H{
 			"contact": contact,
-			"errors": map[string]string{
-				"Email": err.Error(),
-			},
+			"errors":  FieldErrors(err),
 		}))
 	}
 
@@ -84,12 +86,14 @@ func handleContactNew(c *gin.Context) {
 func handleContactView(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
 
 	contact, err := contactRepo.Find(c.Request.Context(), int(id))
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
@@ -100,12 +104,14 @@ func handleContactView(c *gin.Context) {
 func handleContactEditGet(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
 
 	contact, err := contactRepo.Find(c.Request.Context(), int(id))
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
@@ -119,12 +125,14 @@ func handleContactEditGet(c *gin.Context) {
 func handleContactEdit(c *gin.Context) {
 	var contactUpd Contact
 	if err := c.Bind(&contactUpd); err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
 
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
@@ -132,11 +140,10 @@ func handleContactEdit(c *gin.Context) {
 	contactUpd.ID = int(id)
 
 	if err := contactRepo.Save(c.Request.Context(), &contactUpd); err != nil {
+		log.Println(err)
 		c.HTML(http.StatusOK, "edit.html", templateData(c, gin.H{
 			"contact": contactUpd,
-			"errors": map[string]string{
-				"Email": err.Error(),
-			},
+			"errors":  FieldErrors(err),
 		}))
 	}
 
@@ -147,11 +154,13 @@ func handleContactEdit(c *gin.Context) {
 func handleContactDelete(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
 
 	if err := contactRepo.Delete(c.Request.Context(), int(id)); err != nil {
+		log.Println(err)
 		renderError(c, err)
 		return
 	}
