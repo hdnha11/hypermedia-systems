@@ -3,7 +3,8 @@
 {{define "content"}}
 <form action="/contacts" method="get" class="tool-bar">
   <label for="search">Search Term</label>
-  <input id="search" type="search" name="q" value="{{.context.Query `q`}}" />
+  <input id="search" type="search" name="q" value="{{.context.Query `q`}}" hx-get="/contacts"
+    hx-trigger="search, keyup delay:200ms changed" hx-target="tbody" hx-select="tbody tr" />
   <input type="submit" value="Search" />
 </form>
 
