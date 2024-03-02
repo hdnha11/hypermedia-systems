@@ -33,10 +33,10 @@
     {{if .data.contacts | len | eq .data.pageSize}}
     <tr>
       <td colspan="5" style="text-align: center">
-        <button hx-get="/contacts?page={{inc .data.page}}" hx-target="closest tr" hx-swap="outerHTML"
-          hx-select="tbody > tr">
-          Load More
-        </button>
+        <span hx-get="/contacts?page={{inc .data.page}}" hx-trigger="revealed" hx-target="closest tr"
+          hx-swap="outerHTML" hx-select="tbody > tr">
+          Loading More...
+        </span>
       </td>
     </tr>
     {{end}}
