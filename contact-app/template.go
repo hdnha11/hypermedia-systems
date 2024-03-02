@@ -1,11 +1,17 @@
 package main
 
 import (
+	"html/template"
 	"path/filepath"
 
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 )
+
+var funcMap = template.FuncMap{
+	"inc": func(i int) int { return i + 1 },
+	"dec": func(i int) int { return i - 1 },
+}
 
 func loadTemplates(templatesDir string) multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
@@ -24,7 +30,7 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 		layoutCopy := make([]string, len(layouts))
 		copy(layoutCopy, layouts)
 		files := append(layoutCopy, include)
-		r.AddFromFiles(filepath.Base(include), files...)
+		r.AddFromFilesFuncs(filepath.Base(include), funcMap, files...)
 	}
 
 	return r

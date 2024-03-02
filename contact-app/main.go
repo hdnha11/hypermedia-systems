@@ -11,6 +11,12 @@ import (
 
 var contactRepo InMemContactRepository
 
+func init() {
+	if err := contactRepo.Load("./feed.json"); err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	r := gin.Default()
 	r.Static("/static", "./static")
@@ -37,7 +43,20 @@ func handleIndex(c *gin.Context) {
 }
 
 func handleContacts(c *gin.Context) {
+	page := 1
 	search := c.Query("q")
+	pageParam := c.Query("page")
+
+	if pageParam != "" {
+		v, err := strconv.ParseInt(pageParam, 10, 64)
+		if err != nil {
+			log.Println(err)
+			renderError(c, err)
+			return
+		}
+		page = int(v)
+	}
+
 	var (
 		contacts []*Contact
 		err      error
@@ -45,7 +64,7 @@ func handleContacts(c *gin.Context) {
 	if search != "" {
 		contacts, err = contactRepo.Search(c.Request.Context(), search)
 	} else {
-		contacts, err = contactRepo.GetAll(c.Request.Context())
+		contacts, err = contactRepo.GetAll(c.Request.Context(), page)
 	}
 
 	if err != nil {
@@ -54,7 +73,11 @@ func handleContacts(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "index.html", templateData(c, contacts))
+	c.HTML(http.StatusOK, "index.html", templateData(c, gin.H{
+		"contacts": contacts,
+		"page":     page,
+		"pageSize": PAGE_SIZE,
+	}))
 }
 
 func handleContactNewGet(c *gin.Context) {

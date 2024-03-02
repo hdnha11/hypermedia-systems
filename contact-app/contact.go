@@ -2,30 +2,63 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 )
 
+const PAGE_SIZE = 10
+
 type Contact struct {
-	ID    int    `form:"id"`
-	First string `form:"first"`
-	Last  string `form:"last"`
-	Phone string `form:"phone"`
-	Email string `form:"email"`
+	ID    int    `json:"id" form:"id"`
+	First string `json:"first" form:"first"`
+	Last  string `json:"last" form:"last"`
+	Phone string `json:"phone" form:"phone"`
+	Email string `json:"email" form:"email"`
 }
 
 type InMemContactRepository struct {
-	db    []*Contact
-	mu    sync.Mutex
-	total int
+	db      []*Contact
+	mu      sync.Mutex
+	autoInc int
 }
 
-func (r *InMemContactRepository) GetAll(ctx context.Context) ([]*Contact, error) {
+func (r *InMemContactRepository) Load(filePath string) error {
+	bs, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	var contacts []*Contact
+	if err := json.Unmarshal(bs, &contacts); err != nil {
+		return err
+	}
+
+	r.db = contacts
+	r.autoInc = r.maxID()
+
+	return nil
+}
+
+func (r *InMemContactRepository) maxID() int {
+	var m int
+	for _, c := range r.db {
+		m = max(m, c.ID)
+	}
+	return m
+}
+
+func (r *InMemContactRepository) GetAll(ctx context.Context, page int) ([]*Contact, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	return r.db, nil
+	totalItems := len(r.db)
+	start := min((page-1)*PAGE_SIZE, totalItems)
+	end := min(start+PAGE_SIZE, totalItems)
+
+	return r.db[start:end], nil
 }
 
 func (r *InMemContactRepository) Search(ctx context.Context, q string) ([]*Contact, error) {
@@ -81,8 +114,8 @@ func (r *InMemContactRepository) Save(ctx context.Context, contact *Contact) err
 	}
 
 	if contact.ID == 0 {
-		r.total++
-		contact.ID = r.total
+		r.autoInc++
+		contact.ID = r.autoInc
 		r.db = append(r.db, contact)
 	} else {
 		_, found, err := r.find(contact.ID)

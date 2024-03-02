@@ -3,7 +3,7 @@
 {{define "content"}}
 <form action="/contacts" method="get" class="tool-bar">
   <label for="search">Search Term</label>
-  <input id="search" type="search" name="q" value="{{.context.Query "q"}}" />
+  <input id="search" type="search" name="q" value="{{.context.Query `q`}}" />
   <input type="submit" value="Search" />
 </form>
 
@@ -18,7 +18,7 @@
     </tr>
   </thead>
   <tbody>
-    {{range .data}}
+    {{range .data.contacts}}
     <tr>
       <td>{{.First}}</td>
       <td>{{.Last}}</td>
@@ -32,6 +32,17 @@
     {{end}}
   </tbody>
 </table>
+
+<div>
+  <span style="float: right">
+    {{if gt .data.page 1}}
+    <a href="/contacts?page={{dec .data.page}}">Previous</a>
+    {{end}}
+    {{if .data.contacts | len | eq .data.pageSize}}
+    <a href="/contacts?page={{inc .data.page}}">Next</a>
+    {{end}}
+  </span>
+</div>
 
 <p>
   <a href="/contacts/new">Add Contact</a>
