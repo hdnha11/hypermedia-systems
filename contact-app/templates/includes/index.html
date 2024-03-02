@@ -30,19 +30,18 @@
       </td>
     </tr>
     {{end}}
+    {{if .data.contacts | len | eq .data.pageSize}}
+    <tr>
+      <td colspan="5" style="text-align: center">
+        <button hx-get="/contacts?page={{inc .data.page}}" hx-target="closest tr" hx-swap="outerHTML"
+          hx-select="tbody > tr">
+          Load More
+        </button>
+      </td>
+    </tr>
+    {{end}}
   </tbody>
 </table>
-
-<div>
-  <span style="float: right">
-    {{if gt .data.page 1}}
-    <a href="/contacts?page={{dec .data.page}}">Previous</a>
-    {{end}}
-    {{if .data.contacts | len | eq .data.pageSize}}
-    <a href="/contacts?page={{inc .data.page}}">Next</a>
-    {{end}}
-  </span>
-</div>
 
 <p>
   <a href="/contacts/new">Add Contact</a>
